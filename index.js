@@ -1,4 +1,5 @@
 // استدعاء المكتبات اللي ثبتناها
+require("dotenv").config(); // عشان يقرأ من ملف .env
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -9,18 +10,15 @@ const PORT = process.env.PORT || 5000;
 
 // ربط قاعدة البيانات MongoDB
 mongoose
-  .connect(
-    "mongodb+srv://rawako12:Ahmednox12@furnirodb.71yd3rl.mongodb.net/?retryWrites=true&w=majority&appName=FurniroDB",
-    {}
-  )
+  .connect(process.env.MONGO_URI, {})
   .then(() => {
-    console.log("Connected to MongoDB!");
+    console.log("✅ Connected to MongoDB!");
   })
   .catch((err) => {
-    console.error("Connection error", err);
+    console.error("❌ Connection error", err);
   });
 
-// تعريف شكل البيانات (Schema) في قاعدة البيانات
+// تعريف شكل البيانات (Schema)
 const productSchema = new mongoose.Schema({
   id: Number,
   title: String,
@@ -29,23 +27,28 @@ const productSchema = new mongoose.Schema({
   newPrice: Number,
   oldPrice: Number,
   is_New: Boolean,
-  discount: Number
+  discount: Number,
 });
 
-// إنشاء نموذج (Model) للتعامل مع البيانات دي
+// إنشاء نموذج (Model)
 const Product = mongoose.model("Product", productSchema);
 
-// تفعيل Middleware عشان التطبيق يفهم البيانات اللي بتيجي بصيغة JSON
+// Middleware
 app.use(express.json());
-app.use(cors({
-  origin: "http://localhost:5173", // رابط الفرونت
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // عشان لو بتجرب فرونت محلي
+      "https://furniro-beta-olive.vercel.app", // رابط الفرونت على Vercel
+    ], // غيره بعدين للفرونت على Railway
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-// --- مسارات الـ API (API Endpoints) ---
+// --- API Endpoints ---
 
-// مسار لجلب كل المنتجات
+// GET كل المنتجات
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
@@ -55,9 +58,8 @@ app.get("/products", async (req, res) => {
   }
 });
 
-
-// مسار لإضافة أكتر من منتج جديد
-app.post('/products', async (req, res) => {
+// POST إضافة منتجات
+app.post("/products", async (req, res) => {
   try {
     const newProducts = await Product.insertMany(req.body);
     res.status(201).json(newProducts);
@@ -68,5 +70,5 @@ app.post('/products', async (req, res) => {
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
