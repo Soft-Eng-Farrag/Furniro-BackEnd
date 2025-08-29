@@ -37,10 +37,7 @@ const Product = mongoose.model("Product", productSchema);
 app.use(express.json());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // عشان لو بتجرب فرونت محلي
-      "https://furniro-beta-olive.vercel.app", // رابط الفرونت على Vercel
-    ], // غيره بعدين للفرونت على Railway
+    origin: "furniro-backend-production-1e15.up.railway.app", // غيره بعدين للفرونت على Railway
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
