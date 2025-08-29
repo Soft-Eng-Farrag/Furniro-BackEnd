@@ -37,7 +37,7 @@ const Product = mongoose.model("Product", productSchema);
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://furniro-backend-production-1e15.up.railway.app/products", // غيره بعدين للفرونت على Railway
+    origin: "*", // غيره بعدين للفرونت على Railway
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
