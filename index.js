@@ -39,7 +39,8 @@ const wishlistSchema = new mongoose.Schema({
   price: Number,
   description: String,
 });
-const Wishlist = mongoose.model("Wishlist", wishlistSchema);
+const Wishlist = mongoose.model("Wishlist", wishlistSchema, "wishlist");
+
 
 // -------- Middleware --------
 app.use(express.json());
