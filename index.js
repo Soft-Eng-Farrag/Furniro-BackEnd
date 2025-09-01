@@ -92,6 +92,21 @@ app.post("/wishlist", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// 🆕 DELETE: حذف عنصر من الـ wishlist بالـ id
+app.delete("/wishlist/:id", async (req, res) => {
+  try {
+    const deletedItem = await Wishlist.findByIdAndDelete(req.params.id);
+
+    if (!deletedItem) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    res.json({ message: "Item removed from wishlist", item: deletedItem });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 // -------- Server Run --------
 app.listen(PORT, () => {
