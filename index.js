@@ -109,7 +109,7 @@ app.post("/productswishlist", async (req, res) => {
 });
 
 // 🟢 DELETE من الـ wishlist
-app.delete("/productswishlist/:id", async (req, res) => {
+app.delete("/productswishlist/:prodId", async (req, res) => {
   try {
     const deletedItem = await productswishlist.findOneAndDelete({
       prodId: req.params.prodId,
