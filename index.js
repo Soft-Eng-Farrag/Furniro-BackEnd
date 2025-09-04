@@ -3,11 +3,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-// إنشاء تطبيق Express جديد
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ربط قاعدة البيانات MongoDB
+// -------- Connect to MongoDB --------
 mongoose
   .connect(process.env.MONGO_URI, {})
   .then(() => {
@@ -19,7 +18,7 @@ mongoose
 
 // -------- Schemas & Models --------
 
-// Schema للـ Products
+// Products Schema
 const productSchema = new mongoose.Schema({
   id: Number,
   title: String,
@@ -29,18 +28,19 @@ const productSchema = new mongoose.Schema({
   oldPrice: Number,
   is_New: Boolean,
   discount: Number,
+  liked: Boolean, 
 });
 const Product = mongoose.model("Product", productSchema);
 
-// Schema للـ Wishlist
+// Wishlist Schema
 const wishlistSchema = new mongoose.Schema({
+  prodId: String,
   title: String,
   image: String,
   price: Number,
   description: String,
 });
-const Wishlist = mongoose.model("Wishlist", wishlistSchema, "wishlist");
-
+const productswishlist = mongoose.model("productswishlist", wishlistSchema, "productswishlist");
 
 // -------- Middleware --------
 app.use(express.json());
@@ -54,7 +54,7 @@ app.use(
 
 // -------- API Endpoints --------
 
-// Products
+// 🟢 Products Endpoints
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
@@ -73,29 +73,47 @@ app.post("/products", async (req, res) => {
   }
 });
 
-// Wishlist
-app.get("/wishlist", async (req, res) => {
+// 🟢 Wishlist Endpoints
+app.get("/productswishlist", async (req, res) => {
   try {
-    const items = await Wishlist.find();
+    const items = await productswishlist.find();
     res.json(items);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-app.post("/wishlist", async (req, res) => {
+app.post("/productswishlist", async (req, res) => {
   try {
-    const newItem = new Wishlist(req.body);
+    const { prodId, title, image, price, description } = req.body;
+
+    // ✅ check if already exists
+    const exist = await productswishlist.findOne({ prodId });
+    if (exist) {
+      return res.status(400).json({ message: "Item already in wishlist" });
+    }
+
+    const newItem = new productswishlist({
+      prodId,
+      title,
+      image,
+      price,
+      description,
+    });
+
     await newItem.save();
     res.status(201).json(newItem);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-// 🆕 DELETE: حذف عنصر من الـ wishlist بالـ id
-app.delete("/wishlist/:id", async (req, res) => {
+
+// 🟢 DELETE من الـ wishlist
+app.delete("/productswishlist/:id", async (req, res) => {
   try {
-    const deletedItem = await Wishlist.findByIdAndDelete(req.params.id);
+    const deletedItem = await productswishlist.findByIdAndDelete(
+      req.params.id
+    );
 
     if (!deletedItem) {
       return res.status(404).json({ message: "Item not found" });
@@ -106,7 +124,6 @@ app.delete("/wishlist/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 // -------- Server Run --------
 app.listen(PORT, () => {
