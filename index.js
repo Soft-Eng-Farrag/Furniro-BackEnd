@@ -112,7 +112,7 @@ app.post("/productswishlist", async (req, res) => {
 app.delete("/productswishlist/:id", async (req, res) => {
   try {
     const deletedItem = await productswishlist.findByIdAndDelete(
-      req.params.id
+      req.params.prodId
     );
 
     if (!deletedItem) {
