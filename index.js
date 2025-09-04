@@ -111,9 +111,9 @@ app.post("/productswishlist", async (req, res) => {
 // 🟢 DELETE من الـ wishlist
 app.delete("/productswishlist/:id", async (req, res) => {
   try {
-    const deletedItem = await productswishlist.findByIdAndDelete(
-      req.params.prodId
-    );
+    const deletedItem = await productswishlist.findOneAndDelete({
+      prodId: req.params.prodId,
+    });
 
     if (!deletedItem) {
       return res.status(404).json({ message: "Item not found" });
