@@ -64,6 +64,28 @@ app.get("/products", async (req, res) => {
   }
 });
 
+
+// 🟢 Update liked field (true أو false)
+app.put("/products/:id/liked", async (req, res) => {
+  try {
+    const { liked } = req.body; // 👈 ناخد القيمة من الفرونت (true/false)
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      { liked },      // ✅ تحديث القيمة مباشرة
+      { new: true }   // ✅ يرجّع النسخة بعد التحديث
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(updatedProduct);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 app.post("/products", async (req, res) => {
   try {
     const newProducts = await Product.insertMany(req.body);
